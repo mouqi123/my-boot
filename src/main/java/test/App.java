@@ -9,15 +9,17 @@ import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.SpringApplication;
-import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
+import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.boot.jackson.JsonObjectDeserializer;
 import org.springframework.core.env.Environment;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.alibaba.fastjson.JSONObject;
+
+@SpringBootApplication
 @RestController
-@EnableAutoConfiguration
-//@Import(WebConfig.class)
 public class App {
 	
 	@Autowired
@@ -40,7 +42,7 @@ public class App {
 		}
 		log.info(env.getProperty("username"));
 		log.info(username);
-		log.error("test", new Exception());
+		//log.error("test", new Exception());
 //		try {
 //			throw new Exception("exception test");
 //		}catch (Exception e) {
@@ -50,7 +52,17 @@ public class App {
 	}
 	
 	@RequestMapping("/user")
-	public U
+	public UserDO user() {
+		UserDO user = new UserDO();
+		jdbcTemplate.query("select * from t_user where user_id = ?", new Object[]{"3"},
+				(rs, rowNum) -> {
+					user.setUserName(rs.getString("user_name"));
+					user.setPhoneNumber(rs.getString("phone_number"));
+					return user;
+				}).forEach(user1 -> System.out.println(user1.getUserName()));
+		System.out.println(JSONObject.toJSON(user));
+		return user;
+	}
 	
 	public static void main(String[] args) throws Exception {
 		SpringApplication.run(App.class, args);
