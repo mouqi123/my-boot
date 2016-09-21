@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Configuration status="INFO" name="myapp">
+	<Appenders>
+		<Console name="STDOUT" target="SYSTEM_OUT">
+			<PatternLayout pattern="%d %-5p [%t] [%l] %m%n" />
+		</Console>
+
+	<!--	<File name="app" fileName="logs/app.log"
+			append="false" immediateFlush="false">
+			<PatternLayout pattern="%d %-5p [%t] [%l] %m%n" />
+		</File>
+	-->
+		<RollingFile name="DAILY_LOG"
+			fileName="logs/daily.log"
+			filePattern="logs/%d{yyyyMMdd}_daily.log">
+			<PatternLayout pattern="%d %-5p [%t] [%l] %m%n" />
+			<Policies>
+				<TimeBasedTriggeringPolicy interval="1" />
+			</Policies>
+		</RollingFile>
+
+	</Appenders>
+	
+	<Loggers>
+		<Root level="info">
+			<AppenderRef ref="DAILY_LOG" />
+			<AppenderRef ref="STDOUT" />
+		</Root>
+	</Loggers>
+</Configuration>
