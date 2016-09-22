@@ -1,4 +1,4 @@
-package test;
+package com.mackie.domain;
 
 import java.time.LocalDateTime;
 

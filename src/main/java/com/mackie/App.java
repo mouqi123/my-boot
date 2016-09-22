@@ -1,4 +1,5 @@
-package test;
+package com.mackie;
+
 
 import java.util.Enumeration;
 
@@ -10,13 +11,14 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
-import org.springframework.boot.jackson.JsonObjectDeserializer;
 import org.springframework.core.env.Environment;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.alibaba.fastjson.JSONObject;
+import com.mackie.dao.UserDAO;
+import com.mackie.domain.UserDO;
 
 @SpringBootApplication
 @RestController
@@ -29,7 +31,7 @@ public class App {
 	private String username;
 	
 	@Autowired
-	private JdbcTemplate jdbcTemplate;
+	private UserDAO userDAO;
 	
 	private static Logger log = LogManager.getLogger(App.class);
 	
@@ -53,13 +55,7 @@ public class App {
 	
 	@RequestMapping("/user")
 	public UserDO user() {
-		UserDO user = new UserDO();
-		jdbcTemplate.query("select * from t_user where user_id = ?", new Object[]{"3"},
-				(rs, rowNum) -> {
-					user.setUserName(rs.getString("user_name"));
-					user.setPhoneNumber(rs.getString("phone_number"));
-					return user;
-				}).forEach(user1 -> System.out.println(user1.getUserName()));
+		UserDO user = userDAO.queryUserOne(3);
 		System.out.println(JSONObject.toJSON(user));
 		return user;
 	}
