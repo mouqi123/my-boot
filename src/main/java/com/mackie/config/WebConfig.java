@@ -1,44 +1,34 @@
 package com.mackie.config;
 
-import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.http.converter.HttpMessageConverter;
-import org.springframework.web.servlet.ViewResolver;
-import org.springframework.web.servlet.config.annotation.DefaultServletHandlerConfigurer;
-import org.springframework.web.servlet.config.annotation.EnableWebMvc;
-import org.springframework.web.servlet.config.annotation.WebMvcConfigurerAdapter;
-import org.springframework.web.servlet.view.InternalResourceViewResolver;
+import org.springframework.data.redis.connection.RedisConnectionFactory;
+import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.data.redis.serializer.RedisSerializer;
 
-import com.alibaba.fastjson.JSON;
-import com.alibaba.fastjson.serializer.SerializerFeature;
-import com.alibaba.fastjson.support.config.FastJsonConfig;
-import com.alibaba.fastjson.support.spring.FastJsonHttpMessageConverter4;
+import com.mackie.domain.UserDO;
 
+@Configuration
+public class WebConfig {
 
-public class WebConfig extends WebMvcConfigurerAdapter {
+    @Bean
+    @SuppressWarnings("rawtypes")
+    public RedisSerializer fastJson2JsonRedisSerializer() {
+        return new FastJson2JsonRedisSerializer<Object>(Object.class);
+    }
 
-	@Bean
-	@ConditionalOnClass({ JSON.class })
-	public HttpMessageConverter<?> fastJsonHttpMessageConverters() {
-		FastJsonHttpMessageConverter4 fastConverter = new FastJsonHttpMessageConverter4();
+    @Bean
+    @SuppressWarnings("rawtypes")
+    public RedisTemplate<String, UserDO> redisTemplate(RedisConnectionFactory factory, RedisSerializer fastJson2JsonRedisSerializer) {
+    	RedisTemplate<String, UserDO> template = new RedisTemplate<String, UserDO>();
+    	
+    	template.setConnectionFactory(factory);
+    	
+    	template.setStringSerializer(fastJson2JsonRedisSerializer);
 
-		FastJsonConfig fastJsonConfig = new FastJsonConfig();
-		fastJsonConfig.setSerializerFeatures(SerializerFeature.WriteNullStringAsEmpty);
-		fastConverter.setFastJsonConfig(fastJsonConfig);
+        template.setValueSerializer(fastJson2JsonRedisSerializer);
 
-		return fastConverter;
-	}
-
-	@Bean
-	public ViewResolver getViewResolver() {
-		InternalResourceViewResolver resolver = new InternalResourceViewResolver();
-		resolver.setSuffix(".html");
-		return resolver;
-	}
-
-	@Override
-	public void configureDefaultServletHandling(DefaultServletHandlerConfigurer configurer) {
-		configurer.enable();
-	}
+        template.afterPropertiesSet();
+        return template;
+    }
 }

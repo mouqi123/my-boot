@@ -62,8 +62,12 @@ public class App {
 	}
 
 	@RequestMapping("/test1")
-	public String test() {
-		return "test";
+	@ResponseBody
+	public UserDO test() {
+		UserDO user = new UserDO();
+		user.setUserName("mouqi");
+		user.setUserId(1);
+		return user;
 	}
 
 	@RequestMapping("/user")
